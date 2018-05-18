@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Snake</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+<div id="score">SCORE : 0</div>
+
+
+<canvas id="board" width="400" height="400"></canvas>
+
+<div id="controls">
+	<h2> Controls</h2>
+	<p>Up , Down , Left ,Right - Arrow</p>
+	<p>Start Game - "S" </p>
+	<p>Pause - "P" </p>
+
+</div>
+<p id="text"> </p>
+
+
+<script type="text/javascript">
+	
+	var timer;
+    var timer_on_off = 0;
+    var game_over_status = 0;
+	var x =1;
+	var y =0;
+	var pixelsize=15;
+    var xpos = ypos =0;
+    var snake = [];
+    var eats = {x:0 , y:0};
+    var score = 0;
+    eats.x=Math.floor(Math.random()*pixelsize);
+	eats.y=Math.floor(Math.random()*pixelsize);
+
+	window.onload = function () {
+		
+      canvas = document.getElementById('board');
+      ctx = canvas.getContext('2d');
+      
+      document.addEventListener('keydown', keyPush);
+      
+      ctx.fillStyle="black";
+	  ctx.fillRect(0,0,canvas.width,canvas.height);
+	  
+	  ctx.font = "16px Tahoma";
+      ctx.fillStyle= '#55fa0e';
+      ctx.fillText("Press key 'S' or click Button 'Start' to New Game ",20,300);
+      ctx.fillStyle= 'red';
+      ctx.font = "72px Tahoma";
+      ctx.fillText("SNAKE",80,100);
+	}
+ 
+
+///////////// Start game loop
+
+function game_loop() {
+
+
+	if(game_over_status==1){ 
+
+    ctx.fillStyle="black";
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+	
+	ctx.fillStyle= 'silver';	
+	ctx.font = "30px Arial";
+    ctx.fillText("GAME OVER",110,150);
+    
+    ctx.fillStyle = 'red';
+    ctx.fillText("SCORE : "+ score,110,50);
+    
+    ctx.font = "16px Tahoma";
+    ctx.fillStyle= '#55fa0e';
+    ctx.fillText("Press key 'S' or click Button 'Start' to New Game ",20,300);
+
+                 
+      }
+    
+
+
+
+    else {
+
+	xpos +=x;
+    ypos +=y;
+
+    if(xpos<0) {
+		xpos= 26 ;  // 26 ~ canvas.width / pixel size
+	}
+
+	if(xpos>26) {
+		xpos= 0;
+	}
+
+	if(ypos<0) {
+		ypos= 26;
+	}
+	if(ypos>26) {
+		ypos= 0;
+	}
+	
+	
+   
+
+    ctx.fillStyle="black";
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+
+	ctx.fillStyle="lime";
+	
+
+     for(var i =0;i<snake.length;i++){
+
+
+     	
+     	ctx.fillRect(snake[i].x*pixelsize,snake[i].y*pixelsize,pixelsize-2,pixelsize-2);
+     	if(snake[i].x==xpos && snake[i].y==ypos && timer > 10) {
+			
+     			game_over_status=1; break;
+
+			 ///e1
+		}
+     	
+     	
+         
+
+     }
+
+
+     if(eats.x==xpos && eats.y==ypos) {
+		grow_snake(snake ,eats.x ,eats.y);
+        score +=25;
+       document.getElementById('score').innerHTML = 'SCORE:' + " " + score;
+
+
+		eats.x=Math.floor(Math.random()*pixelsize);
+		eats.y=Math.floor(Math.random()*pixelsize);
+	}
+	 ctx.fillStyle="red";
+	 ctx.fillRect(eats.x*pixelsize,eats.y*pixelsize,pixelsize-2,pixelsize-2);
+
+     snake= go_snake(snake,xpos,ypos);
+ 
+   }//end instrukcja   if game_over_status
+     timer = setTimeout(function(){ game_loop() }, 100);
+  
+}///////////////////////// end game loop
+
+function startLoop() {
+    if (!timer_on_off) {
+        timer_on_off = 1;
+        game_loop();
+    }
+}
+
+function stopLoop() {
+    clearTimeout(timer);
+    timer_on_off = 0;
+}
+
+	
+    function pause(){
+
+       if(timer_on_off==0) { startLoop();}
+
+       	else {  stopLoop();  }
+
+
+    } 
+
+	
+
+
+
+	
+
+
+    
+function init_snake(x , y){
+      
+      xpos = ypos = 0;
+      x=1;
+      y=0;
+     snake = [];                                               
+
+  for(i=0;i<5;i++){
+  
+
+  snake.push({x:(x-i),y:y});      
+								
+
+  }
+  return snake;
+
+}
+
+function go_snake( snake ,x,y){
+
+
+  snake.unshift({x:x,y:y});
+
+  snake.pop();
+
+  return snake;
+}
+
+function grow_snake(snake ,x ,y){
+
+	snake.unshift({x:x,y:y});
+
+
+
+
+}
+
+
+ function game_over(){
+
+
+    score=0;
+    timer = 0;
+    x=1;
+    y=0;
+    xpos= ypos =0;
+    snake = [];
+
+
+    
+    
+ 
+
+ 	
+ }
+
+ function start_game(){
+
+ 	game_over_status=0;
+    document.getElementById('score').innerHTML = 'SCORE: 0' ;
+    score=0;
+    timer = 0;
+    x=1;
+    y=0;
+    init_snake(5,0);
+
+    startLoop();
+
+
+
+
+ }
+
+
+
+	function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 37:
+			x=-1;y=0;
+			break;
+		case 38:
+			x=0;y=-1;
+			break;
+		case 39:
+			x=1;y=0;
+			break;
+		case 40:
+			x=0;y=1;
+			break;
+		case 80:
+		     pause();
+		     break;	
+		case 83:
+		    start_game();
+		    break;     
+	}
+
+
+		}
+
+
+
+
+</script>
+
+<center>
+	<button  onclick="start_game()">Start </button>
+    <button onclick="pause()">Pause</button>
+</center>
+ <footer> create by <a href="https://github.com/krzysztoftt/snake">https://github.com/krzysztoftt/snake</a> </footer>
+</body>
+</html>
